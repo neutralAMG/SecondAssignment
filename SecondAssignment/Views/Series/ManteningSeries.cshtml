@@ -1,0 +1,30 @@
+﻿@model List<SecondAssignment.Application.Models.SeriesModel>
+
+<div class="container mt-5">
+    <a asp-controller="Series" asp-action="SaveSeries" class="btn btn-primary mb-4">Add a new Series</a>
+
+    @if (Model.Count == 0)
+    {
+        <h1>There are no series available</h1>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var series in Model)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body w-250">
+                            <h5 class="card-title">@series.Name</h5>
+                            <img src="@series.ImgUrlPath" alt="Image of @series.Name" class="img-fluid mb-3 w-100" height="fit content" />
+                            <p class="card-text"><strong>Genres :</strong> @series.PrimaryGenre.Name, @series.SecundaryGenre.Name</p>
+                            <p class="card-text"><strong>Producer:</strong> @series.Producer.Name</p>
+                            <a href="@Url.Action("EditSeries", "Series", new { id = series.SeriesId })" class="btn btn-outline-warning float-right ml-2">Edit Series</a>
+                            <a href="@Url.Action("DeleteSeries", "Series", new { id = series.SeriesId })" class="btn btn-danger float-right">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

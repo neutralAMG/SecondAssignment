@@ -1,0 +1,31 @@
+﻿@model List<SecondAssignment.Application.Models.ProducerModel>
+
+
+<div class="container mt-4">
+    <a asp-controller="Producer" asp-action="SaveProducer" class="btn btn-primary mb-4">Add a new Producer</a>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th class="text-center">Edit</th>
+                    <th class="text-center">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var producer in Model)
+                {
+                    <tr >
+                        <td>@producer.Name</td>
+                        <td class ="text-center">
+                            <a href="@Url.Action("EditProducer", "Producer", new { id = producer.ProducersId })" class="btn btn-info btn-sm">Edit</a>
+                        </td>
+                        <td class="text-center">
+                            <a href="@Url.Action("DeleteProducer", "Producer", new { id = producer.ProducersId })" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

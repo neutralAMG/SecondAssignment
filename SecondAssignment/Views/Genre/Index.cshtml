@@ -1,0 +1,31 @@
+﻿@model List<SecondAssignment.Application.Models.GenreModel>
+
+
+<div class="container mt-4">
+    <a asp-controller="Genre" asp-action="SaveGenre" class="btn btn-primary mb-4">Add a new Genre</a>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th class="text-center">Edit</th>
+                    <th class="text-center">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var genre in Model)
+                {
+                    <tr>
+                        <td>@genre.Name</td>
+                        <td class="text-center">
+                            <a href="@Url.Action("EditGenre", "Genre", new { id = genre.GenreId })" class="btn btn-info btn-sm">Edit</a>
+                        </td>
+                        <td class="text-center">
+                            <a href="@Url.Action("DeleteGenre", "Genre", new { id = genre.GenreId })" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

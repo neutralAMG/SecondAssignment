@@ -1,0 +1,24 @@
+﻿@model SecondAssignment.Application.Models.SeriesModel
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">@Model.Name</h1>
+        </div>
+        <div class="card-body">
+            <img src="@Model.ImgUrlPath" alt="Image of @Model.Name" class="img-fluid mb-3" />
+            <p class="card-text">@Model.Description</p>
+            <h2 class="h4">Produced by: @Model.Producer.Name</h2>
+            <h3 class="h5">Genres:</h3>
+            <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item">@Model.PrimaryGenre.Name</li>
+                <li class="list-group-item">@Model.SecundaryGenre.Name</li>
+            </ul>
+            <div class="embed-responsive embed-responsive-16by9 mb-3">
+                <iframe class="embed-responsive-item" src="@Model.VideoUrlPath" allowfullscreen></iframe>
+            </div>
+            <a href="@Model.VideoUrlPath" target="_blank" class="btn btn-outline-warning float-right ml-2">Watch Video</a>
+            <a asp-controller="Series" asp-action="Index" class="btn btn-outline-warning float-right ml-2">Go Back</a>
+        </div>
+    </div>
+</div>

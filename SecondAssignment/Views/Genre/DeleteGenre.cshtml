@@ -1,0 +1,10 @@
+﻿@model SecondAssignment.Application.Models.GenreModel
+
+<div>
+    <form method="post" asp-controller="Genre" asp-action="DeleteGenre">
+        <input type="hidden" name="GenreId" value="@Model.GenreId" />
+        <h1>Are you sure you want to delete this Genre?</h1>
+        <button type="submit" class="btn btn-danger float-end p-2">Delete</button>
+        <a asp-controller="Genre" asp-action="Index" class="btn btn-outline-warning float-end p-2 mx-2">Go Back</a>
+    </form>
+</div>

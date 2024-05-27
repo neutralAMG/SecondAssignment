@@ -1,0 +1,38 @@
+﻿@model List<SecondAssignment.Application.Models.SeriesModel>
+
+
+,<div>
+
+    <div>
+        <form method="post" asp-controller="Series" asp-action="FilterSeriesByName">
+        <input type="text"  name="name"/>
+        <button type="submit">Filter</button>
+        </form>
+    </div>
+    
+    <div class="container mt-5">
+        @if (Model.Count == 0)
+        {
+            <h1>There are no series available</h1>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var series in Model)
+                {
+                    <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body w-250">
+                                <h5 class="card-title">@series.Name</h5>
+                                <img src="@series.ImgUrlPath" alt="Image of @series.Name" class="img-fluid mb-3 w-100" height="fit content" />
+                                <p class="card-text"><strong>Genres :</strong> @series.PrimaryGenre.Name, @series.SecundaryGenre.Name</p>
+                                <p class="card-text"><strong>Producer:</strong> @series.Producer.Name</p>
+                                <a href="@Url.Action("SpecificSeries", "Series", new { id = series.SeriesId })" class="btn btn-outline-info btn-block float-end">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

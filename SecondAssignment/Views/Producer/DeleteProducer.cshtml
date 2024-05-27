@@ -1,0 +1,10 @@
+﻿@model SecondAssignment.Application.Models.ProducerModel
+
+<div>
+    <form method="post" asp-controller="Producer" asp-action="DeleteProducer">
+        <input type="hidden" name="SeriesId" value="@Model.ProducersId" />
+        <h1>Are you sure you want to delete this Producer?</h1>
+        <button type="submit" class="btn btn-danger float-end p-2">Delete</button>
+        <a asp-controller="Producer" asp-action="Index" class="btn btn-outline-warning float-end p-2 mx-2">Go Back</a>
+    </form>
+</div>

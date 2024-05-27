@@ -1,0 +1,57 @@
+﻿@model Dictionary<int, List<SelectListItem>>
+
+<div class="row">
+    <div class="col-8 offset-2">
+        <div class=" bg-dark text-light">
+            <h1 class="text-center"> Add a new series</h1>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <section>
+                    <form method="post" asp-controller="Series" asp-action="SaveSeries">
+
+                        <div class="mb-3">
+                            <label for="Name" class="form-label"> Name</label>
+                            <input type="text" name="Name" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Description" class="form-label"> Description</label>
+                            <input type="text" name="Description" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ImgUrlPath" class="form-label"> Img url</label>
+                            <input type="text" name="ImgUrlPath" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="VideoUrlPath" class="form-label"> Video Url</label>
+                            <input type="text" name="VideoUrlPath" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ProducerId" class="form-label"> Producer</label>
+                            <select name="ProducerId" id="ProducerId" class="form-select" asp-items="(List<SelectListItem>)Model[1]"> </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="PrimaryGenreId" class="form-label"> Primary Genre</label>
+                            <select name="PrimaryGenreId" id="PrimaryGenreId" class="form-select" asp-items="(List<SelectListItem>)Model[2]"></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="SecundaryGenreId" class="form-label"> Secundary Genre</label>
+                            <select name="SecundaryGenreId" id="SecundaryGenreId" class="form-select" asp-items="(List<SelectListItem>)Model[3]"> </select>
+                        </div>
+                        <div class="p-2">
+                            <button asp-controller="Series" asp-action="SaveSeries" class="btn btn-primary  float-end  p-2 "> Save </button>
+                            <a asp-controller="Series" asp-action="Index" class="btn btn-outline-warning  float-end  p-2  mx-2"> Go Back </a>
+                        </div>
+                    </form>
+
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

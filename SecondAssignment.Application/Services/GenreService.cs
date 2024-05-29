@@ -1,4 +1,5 @@
-﻿using SecondAssignment.Application.Contracts;
+﻿using Microsoft.IdentityModel.Tokens;
+using SecondAssignment.Application.Contracts;
 using SecondAssignment.Application.Core;
 using SecondAssignment.Application.Dtos;
 using SecondAssignment.Application.Models;
@@ -51,7 +52,9 @@ namespace SecondAssignment.Application.Services
                 };
                 result.Message = "Genre get was succesfull";
 
-            }catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 result.IsSucces = false;
                 result.Message = "Error finding the Genre";
                 _logger.LogCritical(result.Message + ex.ToString());
@@ -68,7 +71,7 @@ namespace SecondAssignment.Application.Services
             try
             {
                 var genres = await _genreRepository.GetAll();
-                result.Data =  genres.Select(ge => new GenreModel
+                result.Data = genres.Select(ge => new GenreModel
                 {
                     Name = ge.Name,
                     GenreId = ge.GenreId,
@@ -109,13 +112,23 @@ namespace SecondAssignment.Application.Services
             Result<GenreModel> result = new();
             try
             {
-               await _genreRepository.Save(new Genre
+                var ValidatedResult = validate(Savedto);
+
+                if (!ValidatedResult.IsSucces)
+                {
+                    result.IsSucces = ValidatedResult.IsSucces;
+                    result.Message = ValidatedResult.Message;
+                    return result;
+                }
+
+                await _genreRepository.Save(new Genre
                 {
                     Name = Savedto.Name,
                 });
 
                 result.Message = "Genre was saved Succesfully";
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 result.IsSucces = false;
                 result.Message = "Error saving the Genre";
@@ -131,7 +144,16 @@ namespace SecondAssignment.Application.Services
             Result<GenreModel> result = new();
             try
             {
-              await  _genreRepository.Update(new Genre
+                var ValidatedResult = validate(Updatedto);
+
+                if (!ValidatedResult.IsSucces)
+                {
+                    result.IsSucces = ValidatedResult.IsSucces;
+                    result.Message = ValidatedResult.Message;
+                    return result;
+                }
+
+                await _genreRepository.Update(new Genre
                 {
                     GenreId = Updatedto.GenreId,
                     Name = Updatedto.Name,
@@ -148,14 +170,16 @@ namespace SecondAssignment.Application.Services
                 throw;
             }
             return result;
-        }       
+        }
         public async Task<Result<GenreModel>> Delete(Guid id)
         {
             Result<GenreModel> result = new();
             try
             {
                 Genre genreToBeDeleted = await _genreRepository.GetById(id);
-               await _genreRepository.Delete(genreToBeDeleted);
+
+                await _genreRepository.Delete(genreToBeDeleted);
+
                 result.Message = "Genre was deleted Succesfully";
             }
             catch (Exception ex)
@@ -168,6 +192,23 @@ namespace SecondAssignment.Application.Services
             }
             return result;
         }
+        private Result<GenreModel> validate(BaseGenresDtos baseGenresDtos)
+        {
+            Result<GenreModel> result = new();
+            if (baseGenresDtos is null)
+            {
+                result.IsSucces = false;
+                result.Message = "Error saving the Genre";
+                return result;
+            }
 
+            if (baseGenresDtos.Name.IsNullOrEmpty())
+            {
+                result.IsSucces = false;
+                result.Message = "the name is a mandatory field";
+                return result;
+            }
+            return result;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 
+using Microsoft.IdentityModel.Tokens;
 using SecondAssignment.Application.Contracts;
 using SecondAssignment.Application.Core;
 using SecondAssignment.Application.Dtos;
@@ -129,10 +130,12 @@ namespace SecondAssignment.Application.Services
             Result<ProducerModel> result = new();
             try
             {
-                if (SaveDto is null)
+                var ValidatedResult = validate(SaveDto);
+
+                if (!ValidatedResult.IsSucces)
                 {
-                    result.IsSucces = false;
-                    result.Message = "Error saving the Producer";
+                    result.IsSucces = ValidatedResult.IsSucces;
+                    result.Message = ValidatedResult.Message;
                     return result;
                 }
                 await _producerRepository.Save(new Producer
@@ -159,10 +162,12 @@ namespace SecondAssignment.Application.Services
             Result<ProducerModel> result = new();
             try
             {
-                if (UpdateDto is null)
+                var ValidatedResult = validate(UpdateDto);
+
+                if (!ValidatedResult.IsSucces)
                 {
-                    result.IsSucces = false;
-                    result.Message = "Error finding the producer";
+                    result.IsSucces = ValidatedResult.IsSucces;
+                    result.Message = ValidatedResult.Message;
                     return result;
                 }
 
@@ -189,6 +194,7 @@ namespace SecondAssignment.Application.Services
             try
             {
                 Producer producerDeleted = await _producerRepository.GetById(id);
+
                 if (producerDeleted is null)
                 {
                     result.IsSucces = false;
@@ -205,6 +211,25 @@ namespace SecondAssignment.Application.Services
                 result.IsSucces = false;
                 result.Message = "Error Deleted the producer";
                 _logger.LogCritical(result.Message + ex.ToString());
+                return result;
+            }
+            return result;
+        }
+
+        private Result<ProducerModel> validate(BaseProducersDto baseProducerDto)
+        {
+            Result<ProducerModel> result = new();   
+
+            if (baseProducerDto is null)
+            {
+                result.IsSucces = false;
+                result.Message = "Error saving the Producer";
+                return result;
+            }
+            if (baseProducerDto.Name.IsNullOrEmpty())
+            {
+                result.IsSucces = false;
+                result.Message = "the name is a mandatory field";
                 return result;
             }
             return result;

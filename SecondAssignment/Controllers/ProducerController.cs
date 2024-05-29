@@ -2,6 +2,7 @@
 using SecondAssignment.Application.Contracts;
 
 using SecondAssignment.Application.Dtos;
+using SecondAssignment.Application.Services;
 
 namespace SecondAssignment.WepApp.Controllers
 {
@@ -46,18 +47,24 @@ namespace SecondAssignment.WepApp.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.message = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
+                    return View();
+                }
                 var result = await _producerService.Save(saveProducersDto);
 
                 if (!result.IsSucces)
                 {
-                    return View(result.Message);
+                    ViewBag.message = result.Message;
+                    return View();
                 }
 
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
 
@@ -77,7 +84,7 @@ namespace SecondAssignment.WepApp.Controllers
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
 
@@ -88,18 +95,28 @@ namespace SecondAssignment.WepApp.Controllers
         {
             try
             {
+
+                if (!ModelState.IsValid)
+                {
+
+                    var resultInner = await _producerService.Get(updateProducersDto.ProducersId);
+                    ViewBag.message = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
+                    return View(resultInner.Data);
+                }
                 var result = await _producerService.Update(updateProducersDto);
 
                 if (!result.IsSucces)
                 {
-                    return View("EditProducer", result.Message);
+                    var resultInner = await _producerService.Get(updateProducersDto.ProducersId);
+                    ViewBag.message = result.Message;
+                    return View(resultInner.Data);
                 }
 
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
 
@@ -119,7 +136,7 @@ namespace SecondAssignment.WepApp.Controllers
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
 
@@ -139,7 +156,7 @@ namespace SecondAssignment.WepApp.Controllers
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
     }

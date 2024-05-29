@@ -1,7 +1,10 @@
 ﻿@model List<SecondAssignment.Application.Models.SeriesModel>
 
+
 <div class="container mt-5">
-    <a asp-controller="Series" asp-action="SaveSeries" class="btn btn-primary mb-4">Add a new Series</a>
+    <div class="d-flex justify-content-end mb-4">
+        <a asp-controller="Series" asp-action="SaveSeries" class="btn btn-primary">Add a new Series</a>
+    </div>
 
     @if (Model.Count == 0)
     {
@@ -12,15 +15,21 @@
         <div class="row">
             @foreach (var series in Model)
             {
-                <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body w-250">
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm d-flex flex-column">
+                        <img src="@series.ImgUrlPath" alt="Image of @series.Name" class="card-img-top img-fluid" />
+                        <div class="card-body flex-grow-1">
                             <h5 class="card-title">@series.Name</h5>
-                            <img src="@series.ImgUrlPath" alt="Image of @series.Name" class="img-fluid mb-3 w-100" height="fit content" />
-                            <p class="card-text"><strong>Genres :</strong> @series.PrimaryGenre.Name, @series.SecundaryGenre.Name</p>
-                            <p class="card-text"><strong>Producer:</strong> @series.Producer.Name</p>
-                            <a href="@Url.Action("EditSeries", "Series", new { id = series.SeriesId })" class="btn btn-outline-warning float-right ml-2">Edit Series</a>
-                            <a href="@Url.Action("DeleteSeries", "Series", new { id = series.SeriesId })" class="btn btn-danger float-right">Delete</a>
+                            <p class="card-text">
+                                <strong>Genres:</strong> @series.PrimaryGenre.Name, @series.SecundaryGenre.Name<br />
+                                <strong>Producer:</strong> @series.Producer.Name<br />
+                                <br />
+                                @series.Description
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white border-top-0 d-flex justify-content-end">
+                            <a href="@Url.Action("EditSeries", "Series", new { id = series.SeriesId })" class="btn btn-outline-warning mr-2 m-1">Edit Series</a>
+                                <a href="@Url.Action("DeleteSeries", "Series", new { id = series.SeriesId })" class="btn btn-danger  m-1">Delete</a>
                         </div>
                     </div>
                 </div>

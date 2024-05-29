@@ -1,5 +1,9 @@
-﻿@model Dictionary<int, List<SelectListItem>>
+﻿@model Dictionary<int, List<SelectListItem>>  
 
+@if (ViewBag.message is not null)
+{
+    <p class="alert-danger d-block text-center">@ViewBag.message</p>
+}
 <div class="row">
     <div class="col-8 offset-2">
         <div class=" bg-dark text-light">
@@ -7,6 +11,7 @@
         </div>
         <div class="card shadow-sm">
             <div class="card-body">
+           
                 <section>
                     <form method="post" asp-controller="Series" asp-action="SaveSeries">
 
@@ -42,13 +47,15 @@
 
                         <div class="mb-3">
                             <label for="SecundaryGenreId" class="form-label"> Secundary Genre</label>
+                          
                             <select name="SecundaryGenreId" id="SecundaryGenreId" class="form-select" asp-items="(List<SelectListItem>)Model[3]"> </select>
                         </div>
                         <div class="p-2">
                             <button asp-controller="Series" asp-action="SaveSeries" class="btn btn-primary  float-end  p-2 "> Save </button>
-                            <a asp-controller="Series" asp-action="Index" class="btn btn-outline-warning  float-end  p-2  mx-2"> Go Back </a>
+                            <a asp-controller="Series" asp-action="ManteningSeries" class="btn btn-outline-warning  float-end  p-2  mx-2"> Go Back </a>
                         </div>
                     </form>
+
 
                 </section>
             </div>

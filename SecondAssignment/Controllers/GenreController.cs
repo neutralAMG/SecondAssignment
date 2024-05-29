@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SecondAssignment.Application.Contracts;
 using SecondAssignment.Application.Dtos;
+using SecondAssignment.Application.Services;
 
 namespace SecondAssignment.WepApp.Controllers
 {
@@ -46,16 +47,23 @@ namespace SecondAssignment.WepApp.Controllers
         {
             try
             {
-              var result = await _genreService.Save(saveGenresDtos);
+
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.message = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
+                    return View();
+                }
+                var result = await _genreService.Save(saveGenresDtos);
                 if (!result.IsSucces)
                 {
-                    return View(result.Message);
+                    ViewBag.message = result.Message;
+                    return View();
                 }
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
 
@@ -73,7 +81,7 @@ namespace SecondAssignment.WepApp.Controllers
             }
             catch
             {
-                return View();
+                return View("Index");
             }
            
         }
@@ -85,16 +93,25 @@ namespace SecondAssignment.WepApp.Controllers
         {
             try
             {
+
+                if (!ModelState.IsValid)
+                {
+                    var resultInner = await _genreService.Get(updateGenresDtos.GenreId);
+                    ViewBag.message = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
+                    return View(resultInner.Data);
+                }
                 var result = await _genreService.Update(updateGenresDtos);
                 if (!result.IsSucces)
                 {
-                    return View(result.Message);
+                    var resultInner = await _genreService.Get(updateGenresDtos.GenreId);
+                    ViewBag.message = result.Message;
+                    return View(resultInner.Data);
                 }
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
 
@@ -106,13 +123,13 @@ namespace SecondAssignment.WepApp.Controllers
                 var result = await _genreService.Get(id);
                 if (!result.IsSucces)
                 {
-                    return View(result.Message);
+                    return View("Index");
                 }
                 return View(result.Data);
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
 
@@ -126,13 +143,13 @@ namespace SecondAssignment.WepApp.Controllers
                 var result = await _genreService.Delete(id);
                 if (!result.IsSucces)
                 {
-                    return View(result.Message);
+                    return View();
                 }
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View("Index");
             }
         }
     }

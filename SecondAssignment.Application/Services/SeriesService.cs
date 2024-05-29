@@ -1,4 +1,5 @@
-﻿using SecondAssignment.Application.Contracts;
+﻿using Microsoft.IdentityModel.Tokens;
+using SecondAssignment.Application.Contracts;
 using SecondAssignment.Application.Core;
 using SecondAssignment.Application.Dtos;
 using SecondAssignment.Application.Models;
@@ -79,7 +80,7 @@ namespace SecondAssignment.Application.Services
             return result;
         }
 
-        public async  Task<Result<SeriesModel>> Get(Guid id)
+        public async Task<Result<SeriesModel>> Get(Guid id)
         {
             Result<SeriesModel> result = new();
             try
@@ -143,15 +144,16 @@ namespace SecondAssignment.Application.Services
             Result<SeriesModel> result = new();
             try
             {
-                if (SaveDto is null)
+                var ValidatedResult = validate(SaveDto);
+
+                if (!ValidatedResult.IsSucces)
                 {
-                    result.IsSucces = false;
-                    result.Message = "Error finding the series";
+                    result.IsSucces = ValidatedResult.IsSucces;
+                    result.Message = ValidatedResult.Message;
                     return result;
                 }
-                //Add validations 
-
-              await _seriesRepository.Save(new Series
+                
+                await _seriesRepository.Save(new Series
                 {
                     Name = SaveDto.Name,
                     Description = SaveDto.Description,
@@ -161,8 +163,7 @@ namespace SecondAssignment.Application.Services
                     PrimaryGenreId = SaveDto.PrimaryGenreId,
                     SecundaryGenreId = SaveDto.SecundaryGenreId
                 });
-                //Probably should change this
-
+              
                 result.Message = "Series Saved without problems";
 
             }
@@ -179,14 +180,21 @@ namespace SecondAssignment.Application.Services
         public async Task<Result<SeriesModel>> Update(UpdateSeriesDto UpdateDto)
         {
             Result<SeriesModel> result = new();
-            if (UpdateDto is null)
-            {
-                result.IsSucces = false;
-                result.Message = "Error finding the series";
-                return  result;
-            }
+
+
+
+
             try
             {
+
+                var ValidatedResult = validate(UpdateDto);
+
+                if (!ValidatedResult.IsSucces)
+                {
+                    result.IsSucces = ValidatedResult.IsSucces;
+                    result.Message = ValidatedResult.Message;
+                    return result;
+                }
                 await _seriesRepository.Update(new Series
                 {
                     SeriesId = UpdateDto.SeriesId,
@@ -238,7 +246,7 @@ namespace SecondAssignment.Application.Services
             return result;
         }
 
-        public async Task<Result< SeriesModel>> GetSeriesByName(string name)
+        public async Task<Result<SeriesModel>> GetSeriesByName(string name)
         {
             Result<SeriesModel> result = new();
             try
@@ -303,7 +311,9 @@ namespace SecondAssignment.Application.Services
             try
             {
                 var series = await _seriesRepository.GetByGenreId(genreId);
+
                 result.Data = series.Select(se =>
+
                 new SeriesModel
                 {
                     SeriesId = se.SeriesId,
@@ -416,5 +426,57 @@ namespace SecondAssignment.Application.Services
 
             return result;
         }
+        private Result<SeriesModel> validate(BaseSeriesDto baseSeriesDto)
+        {
+            Result<SeriesModel> result = new Result<SeriesModel>();
+
+            if (baseSeriesDto is null)
+            {
+                result.IsSucces = false;
+                result.Message = "Error finding the series";
+                return result;
+            }
+            if (baseSeriesDto.Name.IsNullOrEmpty())
+            {
+                result.IsSucces = false;
+                result.Message = "the name is a mandatory field";
+                return result;
+            }
+
+            if (baseSeriesDto.Description.IsNullOrEmpty())
+            {
+                result.IsSucces = false;
+                result.Message = "the description is a mandatory field";
+                return result;
+            }
+            if (baseSeriesDto.ImgUrlPath.IsNullOrEmpty())
+            {
+                result.IsSucces = false;
+                result.Message = "the img url is a mandatory field";
+                return result;
+            }
+            if (baseSeriesDto.VideoUrlPath.IsNullOrEmpty())
+            {
+                result.IsSucces = false;
+                result.Message = "the video url is a mandatory field";
+                return result;
+            }
+            if (baseSeriesDto.PrimaryGenreId.ToString().IsNullOrEmpty())
+            {
+                result.IsSucces = false;
+                result.Message = "the primary genre is a mandatory field";
+                return result;
+            }
+            if (baseSeriesDto.SecundaryGenreId.ToString().IsNullOrEmpty())
+            {
+                result.IsSucces = false;
+                result.Message = "the secundary genre is a mandatory field";
+                return result;
+            }
+
+            return result;
+        }
     }
+
+
 }

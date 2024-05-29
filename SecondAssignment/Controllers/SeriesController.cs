@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SecondAssignment.Application.Contracts;
 using SecondAssignment.Application.Core;
 using SecondAssignment.Application.Dtos;
@@ -27,14 +28,16 @@ namespace SecondAssignment.WepApp.Controllers
         public async Task<IActionResult> Index()
         {
             Result<List<SeriesModel>> result = await _seriesService.GetAll();
-
             try
             {
+
                 if (!result.IsSucces)
                 {
+                    ViewBag.message = result.Message;
                     return View();
                 }
-
+                Dictionary<int, List<CheckBoxOption>> SelctedLists = genereteSelect.GenereteCheckBoxList(_producerService, _genreService);
+                ViewBag.CheckBoxGenre = SelctedLists;
             }
             catch
             {
@@ -101,16 +104,29 @@ namespace SecondAssignment.WepApp.Controllers
         {
             try
             {
-                var result = await _seriesService.Save(saveSeriesDto);
-                if (!result.IsSucces)
+                
+                GenereteSelectLists SelctedLists = genereteSelect;
+                if (!ModelState.IsValid)
                 {
-                    return View();
+                   
+                    ViewBag.message = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
+                    return View(SelctedLists.GenereteSelectList(_producerService, _genreService));
+                }
+
+
+                var result = await _seriesService.Save(saveSeriesDto);
+
+         
+                if (!result.IsSucces)
+                { 
+                    ViewBag.message = result.Message;
+                    return View(SelctedLists.GenereteSelectList(_producerService, _genreService));
                 }
                 return RedirectToAction(nameof(ManteningSeries));
             }
             catch
             {
-                return View();
+                return Redirect("ManteningSeries");
             }
         }
 
@@ -118,20 +134,23 @@ namespace SecondAssignment.WepApp.Controllers
         public async Task<IActionResult> EditSeries(Guid id)
         {
             Result<SeriesModel> result = await _seriesService.Get(id);
-            Dictionary<int, List<SelectListItem>> SelctedLists = genereteSelect.GenereteSelectList(_producerService, _genreService);
+            
             try
-            {
+            { GenereteSelectLists SelctedLists = genereteSelect;
                 if (!result.IsSucces)
                 {
-                    return View();
-                }
 
+                    return View(SelctedLists.GenereteSelectList( _producerService, _genreService));
+                }
+                SelctedLists.GenereteSelectList(result.Data, _producerService, _genreService);
+                return View(new EditSeriesModel { Series = result.Data, Selectedlists = SelctedLists.GenereteSelectList(result.Data, _producerService, _genreService) });
             }
+
             catch
             {
-
+                return Redirect("ManteningSeries");
             }
-            return View(new EditSeriesModel { Series = result.Data, Selectedlists = SelctedLists });
+            
         }
 
         // POST: SeriesController/Edit/5
@@ -140,18 +159,31 @@ namespace SecondAssignment.WepApp.Controllers
         public async Task<IActionResult> EditSeries(UpdateSeriesDto updateSeriesDto)
         {
             try
-            {
+            {             
+                
+                if (!ModelState.IsValid)
+                {
+                   
+                    Result<SeriesModel> resultInner = await _seriesService.Get(updateSeriesDto.SeriesId);
+                    GenereteSelectLists SelctedLists = genereteSelect;
+                    ViewBag.message = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
+                    return View(new EditSeriesModel { Series = resultInner.Data, Selectedlists = SelctedLists.GenereteSelectList(resultInner.Data, _producerService, _genreService) });
+                }
+                
                 var result = await _seriesService.Update(updateSeriesDto);
+   
                 if (!result.IsSucces)
                 {
-                    ViewBag.error = result.Message;
-                    return Redirect("EditSeries");
+                    Result<SeriesModel> resultInner = await _seriesService.Get(updateSeriesDto.SeriesId);
+                    GenereteSelectLists SelctedLists = genereteSelect;
+                    ViewBag.message = result.Message;
+                    return View(new EditSeriesModel { Series = resultInner.Data, Selectedlists = SelctedLists.GenereteSelectList(resultInner.Data, _producerService, _genreService) });
                 }
 
             }
             catch
             {
-                return View();
+                return Redirect("ManteningSeries");
             }
             return RedirectToAction(nameof(ManteningSeries));
         }
@@ -172,7 +204,7 @@ namespace SecondAssignment.WepApp.Controllers
             }
             catch
             {
-                return View();
+                return Redirect("ManteningSeries");
             }
 
         }
@@ -189,14 +221,14 @@ namespace SecondAssignment.WepApp.Controllers
                 if (!result.IsSucces)
                 {
                     ViewBag.error = result.Message;
-                    return Redirect("EditSeries");
+                    return Redirect("ManteningSeries");
                 }
 
                 return RedirectToAction(nameof(ManteningSeries));
             }
             catch
             {
-                return View();
+                return Redirect("ManteningSeries");
             }
         }
 
@@ -211,32 +243,9 @@ namespace SecondAssignment.WepApp.Controllers
                 {
                     result.Data,
                 };
-                if (!result.IsSucces)
-                {
-                    ViewBag.error = result.Message;
-                    return Redirect("Index");
-                }
-               return View("Index",newList);
-            }
-            catch
-            {
-                return View();
-            }
-            
-        }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FilterSeriesByGenre(string name)
-        {
-            try
-            {
-                var result = await _seriesService.GetSeriesByName(name);
-                List<SeriesModel> newList = new()
-                {
-                    result.Data,
-                };
+                Dictionary<int, List<CheckBoxOption>> SelctedLists = genereteSelect.GenereteCheckBoxList(_producerService, _genreService);
+                ViewBag.CheckBoxGenre = SelctedLists;
                 if (!result.IsSucces)
                 {
                     ViewBag.error = result.Message;
@@ -246,32 +255,57 @@ namespace SecondAssignment.WepApp.Controllers
             }
             catch
             {
-                return View();
+                return View("Index");
+            }
+
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FilterSeriesByGenre(Guid genre)
+        {
+
+            try
+            {
+                var result = await _seriesService.GetByGenreId(genre);
+                Dictionary<int, List<CheckBoxOption>> SelctedLists = genereteSelect.GenereteCheckBoxList(_producerService, _genreService);
+                ViewBag.CheckBoxGenre = SelctedLists;
+
+                if (!result.IsSucces)
+                {
+                    ViewBag.error = result.Message;
+                    return Redirect("Index");
+                }
+                return View("Index", result.Data);
+            }
+            catch
+            {
+                return View("Index");
             }
 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FilterSeriesByProducer(string name)
+        public async Task<IActionResult> FilterSeriesByProducer(Guid producer)
         {
             try
             {
-                var result = await _seriesService.GetSeriesByName(name);
-                List<SeriesModel> newList = new()
-                {
-                    result.Data,
-                };
+                var result = await _seriesService.GetByProducerId(producer);
+                Dictionary<int, List<CheckBoxOption>> SelctedLists = genereteSelect.GenereteCheckBoxList(_producerService, _genreService);
+                ViewBag.CheckBoxGenre = SelctedLists;
+
                 if (!result.IsSucces)
                 {
                     ViewBag.error = result.Message;
                     return Redirect("Index");
                 }
-                return View("Index", newList);
+                return View("Index", result.Data);
             }
             catch
             {
-                return View();
+                return View("Index");
             }
 
         }

@@ -1,4 +1,8 @@
 ﻿@model SecondAssignment.Application.Dtos.SaveProducersDto
+@if (ViewBag.message is not null)
+{
+    <p class="alert-danger d-block text-center">@ViewBag.message</p>
+}
 <div class="row">
     <div class="col-8 offset-2">
         <div class=" bg-dark text-light">
@@ -17,7 +21,6 @@
                             <a asp-controller="Producer" asp-action="Index" class="btn btn-outline-warning  float-end  p-2  mx-2"> Go Back </a>
                         </div>
                     </form>
-
                 </section>
             </div>
         </div>

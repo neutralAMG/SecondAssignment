@@ -1,5 +1,9 @@
 ﻿
 @model SecondAssignment.Application.Models.ProducerModel
+@if (ViewBag.message is not null)
+{
+    <p class="alert-danger d-block text-center">@ViewBag.message</p>
+}
 <div class="row">
     <div class="col-8 offset-2">
         <div class=" bg-dark text-light">
@@ -22,6 +26,7 @@
                     </form>
 
                 </section>
+
             </div>
         </div>
     </div>
